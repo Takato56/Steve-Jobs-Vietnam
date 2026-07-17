@@ -26,8 +26,8 @@ Dữ liệu lấy từ Cổng Dịch vụ công Quốc gia (dichvucong.gov.vn) v
 - Với mỗi thủ tục, ghi rõ: giấy tờ cần thiết, biểu mẫu cần thiết, cơ quan/nơi nộp, và 5–8 trường thông tin hay bị điền sai (sai định dạng CMND/CCCD, ngày tháng không khớp, thiếu chữ ký, sai quan hệ chủ hộ...).
 - Chốt stack ngay:
   - Backend: FastAPI (Python).
-  - Vector store: Chroma hoặc Qdrant.
-  - LLM: Claude API (Sonnet) để sinh câu trả lời, một model embedding (`voyage-3` hoặc `text-embedding-3-small`) để retrieval.
+  - Vector store: Chroma.
+  - LLM: Codex API để sinh câu trả lời, một model embedding `text-embedding-3-small` để retrieval.
   - Frontend: một trang Next.js/React, dùng làm cả demo độc lập lẫn widget chat nhúng.
   - Hosting: Render/Railway cho API, Vercel cho frontend.
 
