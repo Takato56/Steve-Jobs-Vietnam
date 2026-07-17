@@ -1,57 +1,57 @@
-# AI Copilot for Public Services
+# GovEase AI — Project Description
 
-1. Giới thiệu
+## 1. Ý tưởng & Vấn đề cốt lõi
+- Vấn đề: Người dân khó xác định thủ tục, chuẩn bị hồ sơ và chỉ phát hiện lỗi sau khi nộp, dẫn tới hồ sơ bị trả lại, kéo dài thời gian xử lý và tăng tải cho cơ quan.
+- Giải pháp: Một AI Copilot giúp nhận yêu cầu bằng ngôn ngữ tự nhiên, phân loại thủ tục, sinh checklist hồ sơ có cấu trúc và kiểm tra toàn diện trước khi nộp. Kết hợp hai lớp kiểm tra: rule-based (luật xác định) và LLM semantic checks; mọi hướng dẫn phải kèm trích dẫn nguồn chính thức.
 
-AI Copilot for Public Services là trợ lý AI giúp người dân thực hiện thủ tục hành chính trực tuyến. Hệ thống xác định đúng thủ tục, hướng dẫn chuẩn bị hồ sơ, kiểm tra tính hợp lệ trước khi nộp và cung cấp hướng dẫn dựa trên quy định chính thức.
+## 2. Mô tả giải pháp & Hướng tiếp cận ban đầu
+Mục tiêu: xây dựng pipeline demo trong 48 giờ cho 3 thủ tục (đăng ký thường trú, khai sinh, trạng thái công dân), đảm bảo tính grounded và dễ tích hợp.
+- Thu thập & ingest dữ liệu:
+	- Nguồn: dichvucong.gov.vn, biểu mẫu PDF, hướng dẫn cơ quan.
+	- Lưu trữ dưới dạng Markdown/JSON; chunk theo bước logic (một chunk = một giấy tờ / một bước / một giải thích trường), giữ `source_url`, `procedure_id`, `field_id`.
+	- Script ingest: crawl/manual → normalize → chunk → metadata tagging → embed.
 
-2. Vấn đề
+- Retrieval & Reranking:
+	- Hybrid RAG: metadata filter → keyword search → vector search (Chroma) → reranker (metadata boost + simple BM25/TF-IDF).
+	- Embedding: `text-embedding-3-small` để build vectors; lưu `source_url` cho mỗi vector.
 
-Dù nhiều thủ tục đã số hóa, người dân vẫn gặp khó:
+- Generation & Grounding:
+	- LLM (GPT/Gemini) nhận context có chunk trích dẫn, trả về output có cấu trúc (JSON checklist, steps, examples) kèm `sources`.
+	- Template prompt bắt buộc: instruction + grounding chunks + expected JSON schema.
 
-- Xác định sai thủ tục.
-- Hiểu và áp dụng quy định phức tạp.
-- Chuẩn bị hồ sơ thiếu hoặc điền sai.
-- Chỉ phát hiện lỗi sau khi nộp và bị yêu cầu bổ sung.
+- Validation (hai lớp):
+	1. Rule-based engine: kiểm tra required fields, format (CCCD, ngày), business rules. Deterministic, có test cases.
+	2. LLM semantic checks: cross-field consistency, mâu thuẫn ngữ nghĩa, gợi ý sửa.
+	- Output chuẩn: list lỗi {field, error_type, message, suggestion, source_reference}.
 
-Hệ quả:
+- UI & Integration:
+	- `FastAPI` backend exposes `/api/intake`, `/api/check` với OpenAPI spec.
+	- `React/Next.js` frontend + embeddable widget (iframe/shadow DOM) tiêu thụ JSON và hiển thị checklist/validation.
 
-- Tăng hồ sơ trả lại.
-- Kéo dài thời gian xử lý.
-- Áp lực cho cơ quan tiếp nhận.
+- Công cụ vận hành & QA:
+	- OCR (Tesseract / cloud OCR) cho PDF/ảnh nhập liệu.
+	- CI: unit tests cho rule engine, e2e tests cho ingest→RAG→generation→validation.
+	- Logging & auditing: trace request → chunks used → source_url, metric cho accuracy/latency.
 
-3. Giải pháp
+- Lộ trình 48h (tóm tắt):
+	1. Checkpoint 0: chốt scope 3 thủ tục, chuẩn bị dữ liệu mẫu.
+	2. Checkpoint 1: ingest + embed + verify retrieval.
+	3. Checkpoint 2: guided intake flow + classification.
+	4. Checkpoint 3: validation engine (rules + LLM checks).
+	5. Checkpoint 4: widget + API + deploy demo.
 
-AI Copilot đồng hành cùng người dân trước khi nộp hồ sơ, với 3 năng lực chính:
+Ghi chú: Giữ tách biệt rõ ràng giữa luật (deterministic) và LLM (probabilistic); mọi phản hồi cần kèm `source_url` để đảm bảo auditability và compliance.
 
-- **Guided Intake:** hiểu nhu cầu bằng ngôn ngữ tự nhiên, xác định thủ tục, hỏi làm rõ và tạo checklist hồ sơ theo từng trường hợp.
-- **Pre-submission Validation:** phát hiện thiếu giấy tờ, sai định dạng, vi phạm điều kiện và mâu thuẫn thông tin trước khi nộp.
-- **Grounded AI:** mọi hướng dẫn đều dựa trên nguồn dữ liệu chính thức và kèm trích dẫn quy định.
+## 3. Đối tượng khách hàng & Tác động (Target Audience & Impact)
+- Người dân: chuẩn bị đúng hồ sơ ngay lần đầu, giảm lượt đi lại và chi phí, trải nghiệm trực tuyến tốt hơn.
+- Cán bộ tiếp nhận: giảm hồ sơ trả lại, giảm thời gian xử lý bổ sung, tập trung vào nhiệm vụ chuyên môn.
+- Đơn vị triển khai (Sở, Trung tâm, Cổng): nâng cao chất lượng đầu vào, giảm tải vận hành và dễ triển khai theo module.
+- KPIs: giảm % hồ sơ trả lại, giảm thời gian xử lý trung bình, tăng tỉ lệ hoàn thành hồ sơ lần đầu.
 
-4. Công nghệ
-- LLM
-- Retrieval-Augmented Generation (Hybrid RAG)
-- Embedding Model + Vector Database (Chroma)
-- Rule-based Validation Engine
-- Python (FastAPI) – Backend
-- React / Next.js – Frontend
-- Firebase – Authentication & Hosting
-- REST API và Widget để tích hợp với Cổng Dịch vụ công
-
-
-5. Giá trị mang lại
-5.1. Người dân
-- Chuẩn bị đúng hồ sơ ngay từ lần đầu.
-- Giảm thời gian tra cứu và bổ sung hồ sơ.
-- Nâng cao trải nghiệm dịch vụ công trực tuyến.
-
-5.2. Cơ quan nhà nước
-- Giảm tỷ lệ hồ sơ không hợp lệ.
-- Giảm khối lượng xử lý hồ sơ bổ sung.
-- Nâng cao hiệu quả vận hành và chất lượng dịch vụ.
-
-6. Kế hoạch sau Hackathon
-- Mở rộng từ 2–3 thủ tục thí điểm sang nhiều lĩnh vực hành chính.
-- Tự động cập nhật dữ liệu từ nguồn quy định chính thức.
-- Tích hợp với Cổng Dịch vụ công cấp tỉnh qua API hoặc widget.
-- Thêm khả năng đọc và kiểm tra tài liệu (OCR) từ ảnh/PDF.
-- Phát triển thành nền tảng AI Copilot cho toàn bộ hệ sinh thái dịch vụ công số.
+## 4. Tính khả thi & Điểm độc đáo (Feasibility & Uniqueness)
+- Tính khả thi: Thiết kế modular cho phép thí điểm nhanh (3 thủ tục) và demo trong 48 giờ: ingest → embed → vector store → RAG → generation + validation → widget/API.
+- Điểm độc đáo:
+	- Hướng dẫn có căn cứ (grounded) kèm trích dẫn nguồn theo chunk.
+	- Hai lớp kiểm tra tách biệt: luật (deterministic) và LLM (semantic) — minh chứng tư duy kỹ thuật.
+	- Đầu ra cấu trúc (JSON checklist + lỗi có trường, mô tả, gợi ý sửa) sẵn sàng cho UI/widget nhúng.
+	- Tích hợp (API/widget) không thay đổi quy trình vận hành hiện hữu.
