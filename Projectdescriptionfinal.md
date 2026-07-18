@@ -29,14 +29,10 @@
 
 **3. Sinh hướng dẫn bằng AI (Grounded Generation)**
 - Người dùng mô tả nhu cầu bằng ngôn ngữ tự nhiên.
-- LLM xác định thủ tục phù hợp, chỉ hỏi thêm tối đa **một câu** nếu thông tin chưa rõ.
-- AI sinh **checklist hồ sơ**, hướng dẫn từng bước và ví dụ điền biểu mẫu theo **định dạng JSON có cấu trúc**.
+- LLM xác định thủ tục phù hợp, chỉ hỏi tối đa **một câu** mỗi lần nếu thông tin chưa rõ.
+- AI hướng dẫn từng bước làm thủ tục theo **định dạng JSON có cấu trúc**.
 - Mọi phản hồi đều dựa trên dữ liệu RAG và kèm **trích dẫn nguồn chính thức**.
 
-**4. Kiểm tra hồ sơ trước khi nộp**
-Hệ thống sử dụng hai lớp kiểm tra độc lập:
-- **Rule-based Validation:** phát hiện các lỗi xác định như thiếu giấy tờ, trường bắt buộc chưa điền, sai định dạng CCCD, ngày tháng, chữ ký và các quy tắc nghiệp vụ.
-- **LLM Semantic Validation:** phát hiện mâu thuẫn giữa các trường thông tin, lỗi ngữ nghĩa và đưa ra gợi ý chỉnh sửa phù hợp.
 
 **5. Tích hợp và triển khai**
 - **Backend:** FastAPI, cung cấp các API như `/api/intake` và `/api/check`.
