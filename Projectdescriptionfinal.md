@@ -44,14 +44,14 @@
 - Ghi nhận log của từng yêu cầu, các chunk được truy xuất và nguồn dữ liệu sử dụng nhằm đảm bảo **auditability**, **traceability** và khả năng đối chiếu với quy định hiện hành.
 - Theo dõi các chỉ số như **độ chính xác truy xuất**, **tỷ lệ phát hiện lỗi**, **độ trễ phản hồi** và **tính đầy đủ của hướng dẫn**.
 
-
+rd
 ```mermaid
-flowchart TD
-    citizen[Người dân] --> ui[Next.js portal / widget] 
-    ui --> api[FastAPI /api/v1]
-
+flowchart LR
 
     subgraph chatFlow["Luồng chat tạo hướng dẫn"]
+
+        citizen[Người dân] --> ui[Next.js portal / widget] 
+        ui --> api[FastAPI /api/v1]
         api --> chatEndpoint["POST /chat"]
         chatEndpoint --> resolveIntent["ChatService._resolve_intent()"]
         resolveIntent --> probe["ProcedureAssistant.guided_intake() probe"]
