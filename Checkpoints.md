@@ -46,7 +46,6 @@ Dữ liệu lấy từ Cổng Dịch vụ công Quốc gia (dichvucong.gov.vn) v
 - **Kiểm tra:** 5 cách diễn đạt khác nhau của cùng một nhu cầu đều dẫn đến đúng thủ tục và checklist.
 
 ### Checkpoint 3 (Giờ 25–30): Năng lực 2 — Kiểm tra trước khi nộp Tích hợp
-
 - REST API (`/api/v1/chat`).
 - Widget nhúng: đoạn JS nhỏ gắn iframe hoặc shadow-DOM chat box, nhúng vào một trang HTML "cổng dịch vụ công" giả lập tự tạo.
 
