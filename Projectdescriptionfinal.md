@@ -35,7 +35,7 @@
 
 
 **5. Tích hợp và triển khai**
-- **Backend:** FastAPI, cung cấp các API như `/api/intake` và `/api/check`.
+- **Backend:** FastAPI, cung cấp API `/api/v1/chat`.
 - **Frontend:** React/Next.js hiển thị checklist và kết quả kiểm tra dưới dạng trực quan.
 - Hỗ trợ triển khai dưới dạng **website độc lập**, **chatbot** hoặc **widget nhúng** (iframe/shadow DOM) để tích hợp trực tiếp vào Cổng Dịch vụ công mà không cần thay đổi hạ tầng hiện có.
 
@@ -47,78 +47,37 @@
 
 ```mermaid
 flowchart TD
+    citizen[Người dân] --> ui[Next.js portal / widget] 
+    ui --> api[FastAPI /api/v1]
 
-    A[Người dân nhập nhu cầu]
-    B[AI Orchestrator]
-    C[Intent Detection]
-    D{Đã đủ thông tin chưa?}
 
-    E[LLM hỏi câu làm rõ]
-    F[Tạo truy vấn tìm kiếm]
+    subgraph chatFlow["Luồng chat tạo hướng dẫn"]
+        api --> chatEndpoint["POST /chat"]
+        chatEndpoint --> resolveIntent["ChatService._resolve_intent()"]
+        resolveIntent --> probe["ProcedureAssistant.guided_intake() probe"]
+        probe --> intentDecision{"Đủ rõ thủ tục chưa?"}
 
-    G[Hybrid Retrieval]
+        intentDecision -->|Chưa rõ| clarification["Trả về 1 câu hỏi làm rõ"]
+        clarification --> ui
 
-    H[Metadata Filter]
-    I[Keyword Search]
-    J[Vector Search]
+        intentDecision -->|Đủ rõ| scopedIntake["guided_intake() với procedure_code nếu có"]
+        scopedIntake --> localClassifier["KeywordRetriever classify/search\nfew-shot + keyword fallback"]
+        localClassifier --> procedureStore[(Procedure JSON trong data2)]
+        procedureStore --> checklist["Checklist, bước, giấy tờ, nguồn"]
 
-    K[Kho dữ liệu thủ tục]
+        scopedIntake --> retrievalQuery["Tạo retrieval_query\nmessage + title nếu đã resolve"]
+        retrievalQuery --> chromaSearch["ChromaRetriever.search()"]
+        chromaSearch --> embed["OpenAIEmbeddingService.embed_query()"]
+        embed --> chroma[(Chroma vector collection)]
+        chroma --> chunks["Retrieved chunks"]
 
-    L[Reranker]
+        chunks --> hasChunks{"Có chunks + OpenAI key?"}
+        checklist --> hasChunks
+        hasChunks -->|Không| fallbackAnswer["Trả lời bằng local data / retrieval-only"]
+        hasChunks -->|Có| llmAnswer["OpenAI Responses API\nsinh trả lời có cấu trúc"]
+        fallbackAnswer --> chatResponse["ChatResponse: answer, summary,\nkey_points, sources, procedure, mode"]
+        llmAnswer --> chatResponse
+        chatResponse --> ui
+    end
 
-    M[Các đoạn quy định phù hợp nhất]
-
-    N[LLM tạo hướng dẫn có nguồn]
-
-    O[Checklist + Các bước + Phí + Thời gian]
-
-    P[Người dân nhập hồ sơ]
-
-    Q[Validation Engine]
-
-    R[Kiểm tra điều kiện]
-    S[Kiểm tra mâu thuẫn]
-    T[Kiểm tra định dạng]
-    U[Kiểm tra trường bắt buộc]
-
-    V[Báo cáo lỗi và cách sửa]
-
-    %% Guided Intake
-    A --> B
-    B --> C
-    C --> D
-
-    D -- Chưa --> E
-    E --> A
-
-    D -- Đủ --> F
-    F --> G
-
-    %% Hybrid Retrieval
-    G --> H
-    G --> I
-    G --> J
-
-    H --> K
-    I --> K
-    J --> K
-
-    K --> L
-    L --> M
-    M --> N
-    N --> O
-
-    %% Validation
-    O --> P
-    P --> Q
-
-    Q --> R
-    Q --> S
-    Q --> T
-    Q --> U
-
-    R --> V
-    S --> V
-    T --> V
-    U --> V
 ```	
