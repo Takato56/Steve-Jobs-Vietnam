@@ -1,4 +1,6 @@
 # AI Copilot for Public Services Flowchart
+'''mermaid
+
 flowchart TD
     A([Bắt đầu])
 
@@ -56,3 +58,4 @@ flowchart TD
 
     L -- Không --> N
     N --> Q
+'''
