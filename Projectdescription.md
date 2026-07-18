@@ -4,7 +4,12 @@
 - Vấn đề: Người dân khó xác định thủ tục, chuẩn bị hồ sơ và chỉ phát hiện lỗi sau khi nộp, dẫn tới hồ sơ bị trả lại, kéo dài thời gian xử lý và tăng tải cho cơ quan.
 - Giải pháp: Một AI Copilot giúp nhận yêu cầu bằng ngôn ngữ tự nhiên, phân loại thủ tục, sinh checklist hồ sơ có cấu trúc và kiểm tra toàn diện trước khi nộp. Kết hợp hai lớp kiểm tra: rule-based (luật xác định) và LLM semantic checks; mọi hướng dẫn phải kèm trích dẫn nguồn chính thức.
 
-## 2. Mô tả giải pháp & Hướng tiếp cận ban đầu
+## 2. Đối tượng khách hàng & Tác động (Target Audience & Impact)
+- Người dân: chuẩn bị đúng hồ sơ ngay lần đầu, giảm lượt đi lại và chi phí, trải nghiệm trực tuyến tốt hơn.
+- Cán bộ tiếp nhận: giảm hồ sơ trả lại, giảm thời gian xử lý bổ sung, tập trung vào nhiệm vụ chuyên môn.
+- Đơn vị triển khai (Sở, Trung tâm, Cổng): nâng cao chất lượng đầu vào, giảm tải vận hành và dễ triển khai theo module.
+
+## 3. Mô tả giải pháp & Hướng tiếp cận ban đầu
 Mục tiêu: xây dựng pipeline demo trong 48 giờ cho 3 thủ tục (đăng ký thường trú, khai sinh, trạng thái công dân), đảm bảo tính grounded và dễ tích hợp.
 - Thu thập & ingest dữ liệu:
 	- Nguồn: dichvucong.gov.vn, biểu mẫu PDF, hướng dẫn cơ quan.
@@ -118,16 +123,4 @@ flowchart TD
     T --> V
     U --> V
 ```	
-## 3. Đối tượng khách hàng & Tác động (Target Audience & Impact)
-- Người dân: chuẩn bị đúng hồ sơ ngay lần đầu, giảm lượt đi lại và chi phí, trải nghiệm trực tuyến tốt hơn.
-- Cán bộ tiếp nhận: giảm hồ sơ trả lại, giảm thời gian xử lý bổ sung, tập trung vào nhiệm vụ chuyên môn.
-- Đơn vị triển khai (Sở, Trung tâm, Cổng): nâng cao chất lượng đầu vào, giảm tải vận hành và dễ triển khai theo module.
-- KPIs: giảm % hồ sơ trả lại, giảm thời gian xử lý trung bình, tăng tỉ lệ hoàn thành hồ sơ lần đầu.
 
-## 4. Tính khả thi & Điểm độc đáo (Feasibility & Uniqueness)
-- Tính khả thi: Thiết kế modular cho phép thí điểm nhanh (3 thủ tục) và demo trong 48 giờ: ingest → embed → vector store → RAG → generation + validation → widget/API.
-- Điểm độc đáo:
-	- Hướng dẫn có căn cứ (grounded) kèm trích dẫn nguồn theo chunk.
-	- Hai lớp kiểm tra tách biệt: luật (deterministic) và LLM (semantic) — minh chứng tư duy kỹ thuật.
-	- Đầu ra cấu trúc (JSON checklist + lỗi có trường, mô tả, gợi ý sửa) sẵn sàng cho UI/widget nhúng.
-	- Tích hợp (API/widget) không thay đổi quy trình vận hành hiện hữu.
