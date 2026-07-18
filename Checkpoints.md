@@ -31,20 +31,26 @@ Dữ liệu lấy từ Cổng Dịch vụ công Quốc gia (dichvucong.gov.vn) v
   - Frontend: một trang Next.js/React, dùng làm cả demo độc lập lẫn widget chat nhúng.
   - Hosting: Render/Railway cho API, Vercel cho frontend.
 
-### Checkpoint 1 (Giờ 3–10): Dữ liệu + pipeline RAG
+### Checkpoint 1 (Giờ 3–15): Dữ liệu + pipeline RAG
 
 - Thu thập thủ công các trang thủ tục, mẫu biểu, hướng dẫn cho 2–3 thủ tục đã chọn. Lưu dưới dạng Markdown/JSON có cấu trúc.
 - Chia chunk theo *bước logic* (một chunk = một mục giấy tờ, một giải thích trường biểu mẫu, một bước quy trình), không chia theo cửa sổ token cố định.
 - Xây script ingest → embedding → lưu vào vector store. Test với 10 câu hỏi thủ công mỗi thủ tục.
+- Với mỗi thủ tục cần kèm theo bản PDF chi tiết thủ tục trên dichvucong.gov.vn ban hành
 - **Kiểm tra:** context lấy về đúng và có thể trích dẫn được (giữ trường `source_url` cho mỗi chunk).
 
-### Checkpoint 2 (Giờ 10–20): Năng lực 1 — Hướng dẫn ban đầu
+### Checkpoint 2 (Giờ 15–25): Năng lực 1 — Hướng dẫn ban đầu
 
 - Luồng hội thoại: mô tả nhu cầu → phân loại thủ tục (few-shot) → hỏi lại tối đa MỘT câu nếu mơ hồ → retrieval → sinh danh sách giấy tờ, quy trình từng bước, ví dụ minh họa cho ít nhất một trường phức tạp.
 - Đầu ra có cấu trúc (JSON → checklist trên UI), không phải văn bản dài.
 - **Kiểm tra:** 5 cách diễn đạt khác nhau của cùng một nhu cầu đều dẫn đến đúng thủ tục và checklist.
 
-### Checkpoint 3 (Giờ 20–30): Năng lực 2 — Kiểm tra trước khi nộp
+### Checkpoint 3 (Giờ 25–30): Năng lực 2 — Kiểm tra trước khi nộp Tích hợp
+
+- REST API (`/api/v1/chat`).
+- Widget nhúng: đoạn JS nhỏ gắn iframe hoặc shadow-DOM chat box, nhúng vào một trang HTML "cổng dịch vụ công" giả lập tự tạo.
+
+### Checkpoint 4 (Giờ 30–36): Năng lực 3 — Tích hợp
 
 Hai lớp kiểm tra:
 
@@ -54,12 +60,6 @@ Hai lớp kiểm tra:
 Đầu ra: danh sách lỗi, mỗi lỗi gồm trường bị lỗi, lỗi gì, gợi ý sửa.
 
 - **Kiểm tra:** 5 mẫu đơn có cài sẵn lỗi (kết hợp cả hai lớp), tất cả đều bị phát hiện đúng.
-
-### Checkpoint 4 (Giờ 30–36): Năng lực 3 — Tích hợp
-
-- REST API (`/api/intake`, `/api/check`) kèm OpenAPI spec.
-- Widget nhúng: đoạn JS nhỏ gắn iframe hoặc shadow-DOM chat box, nhúng vào một trang HTML "cổng dịch vụ công" giả lập tự tạo.
-- **Kiểm tra:** widget tải và hoạt động trên trang HTML thuần, không có JS nào khác.
 
 ### Checkpoint 5 (Giờ 36–42): Deploy demo trực tiếp
 
