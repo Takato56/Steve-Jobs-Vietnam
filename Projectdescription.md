@@ -41,7 +41,83 @@ Mục tiêu: xây dựng pipeline demo trong 48 giờ cho 3 thủ tục (đăng 
 	5. Checkpoint 4: widget + API + deploy demo.
 
 Ghi chú: Giữ tách biệt rõ ràng giữa luật (deterministic) và LLM (probabilistic); mọi phản hồi cần kèm `source_url` để đảm bảo auditability và compliance.
+```mermaid
+flowchart TD
 
+    A[Người dân nhập nhu cầu]
+    B[AI Orchestrator]
+    C[Intent Detection]
+    D{Đã đủ thông tin chưa?}
+
+    E[LLM hỏi câu làm rõ]
+    F[Tạo truy vấn tìm kiếm]
+
+    G[Hybrid Retrieval]
+
+    H[Metadata Filter]
+    I[Keyword Search]
+    J[Vector Search]
+
+    K[Kho dữ liệu thủ tục]
+
+    L[Reranker]
+
+    M[Các đoạn quy định phù hợp nhất]
+
+    N[LLM tạo hướng dẫn có nguồn]
+
+    O[Checklist + Các bước + Phí + Thời gian]
+
+    P[Người dân nhập hồ sơ]
+
+    Q[Validation Engine]
+
+    R[Kiểm tra điều kiện]
+    S[Kiểm tra mâu thuẫn]
+    T[Kiểm tra định dạng]
+    U[Kiểm tra trường bắt buộc]
+
+    V[Báo cáo lỗi và cách sửa]
+
+    %% Guided Intake
+    A --> B
+    B --> C
+    C --> D
+
+    D -- Chưa --> E
+    E --> A
+
+    D -- Đủ --> F
+    F --> G
+
+    %% Hybrid Retrieval
+    G --> H
+    G --> I
+    G --> J
+
+    H --> K
+    I --> K
+    J --> K
+
+    K --> L
+    L --> M
+    M --> N
+    N --> O
+
+    %% Validation
+    O --> P
+    P --> Q
+
+    Q --> R
+    Q --> S
+    Q --> T
+    Q --> U
+
+    R --> V
+    S --> V
+    T --> V
+    U --> V
+```	
 ## 3. Đối tượng khách hàng & Tác động (Target Audience & Impact)
 - Người dân: chuẩn bị đúng hồ sơ ngay lần đầu, giảm lượt đi lại và chi phí, trải nghiệm trực tuyến tốt hơn.
 - Cán bộ tiếp nhận: giảm hồ sơ trả lại, giảm thời gian xử lý bổ sung, tập trung vào nhiệm vụ chuyên môn.
