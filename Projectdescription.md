@@ -10,7 +10,7 @@
 - Đơn vị triển khai (Sở, Trung tâm, Cổng): nâng cao chất lượng đầu vào, giảm tải vận hành và dễ triển khai theo module.
 
 ## 3. Mô tả giải pháp & Hướng tiếp cận ban đầu
-Mục tiêu: xây dựng pipeline demo trong 48 giờ cho 3 thủ tục (đăng ký thường trú, khai sinh, trạng thái công dân), đảm bảo tính grounded và dễ tích hợp.
+Mục tiêu: xây dựng pipeline demo trong 48 giờ cho 2 thủ tục (đăng ký thường trú, khai sinh), đảm bảo tính grounded và dễ tích hợp.
 - Thu thập & ingest dữ liệu:
 	- Nguồn: dichvucong.gov.vn, biểu mẫu PDF, hướng dẫn cơ quan.
 	- Lưu trữ dưới dạng Markdown/JSON; chunk theo bước logic (một chunk = một giấy tờ / một bước / một giải thích trường), giữ `source_url`, `procedure_id`, `field_id`.
