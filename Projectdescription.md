@@ -4,8 +4,13 @@
 - Vấn đề: Người dân khó xác định thủ tục, chuẩn bị hồ sơ và chỉ phát hiện lỗi sau khi nộp, dẫn tới hồ sơ bị trả lại, kéo dài thời gian xử lý và tăng tải cho cơ quan.
 - Giải pháp: Một AI Copilot giúp nhận yêu cầu bằng ngôn ngữ tự nhiên, phân loại thủ tục, sinh checklist hồ sơ có cấu trúc và kiểm tra toàn diện trước khi nộp. Kết hợp hai lớp kiểm tra: rule-based (luật xác định) và LLM semantic checks; mọi hướng dẫn phải kèm trích dẫn nguồn chính thức.
 
-## 2. Mô tả giải pháp & Hướng tiếp cận ban đầu
-Mục tiêu: xây dựng pipeline demo trong 48 giờ cho 3 thủ tục (đăng ký thường trú, khai sinh, trạng thái công dân), đảm bảo tính grounded và dễ tích hợp.
+## 2. Đối tượng khách hàng & Tác động (Target Audience & Impact)
+- Người dân: chuẩn bị đúng hồ sơ ngay lần đầu, giảm lượt đi lại và chi phí, trải nghiệm trực tuyến tốt hơn.
+- Cán bộ tiếp nhận: giảm hồ sơ trả lại, giảm thời gian xử lý bổ sung, tập trung vào nhiệm vụ chuyên môn.
+- Đơn vị triển khai (Sở, Trung tâm, Cổng): nâng cao chất lượng đầu vào, giảm tải vận hành và dễ triển khai theo module.
+
+## 3. Mô tả giải pháp & Hướng tiếp cận ban đầu
+Mục tiêu: xây dựng pipeline demo trong 48 giờ cho 2 thủ tục (đăng ký thường trú, khai sinh), đảm bảo tính grounded và dễ tích hợp.
 - Thu thập & ingest dữ liệu:
 	- Nguồn: dichvucong.gov.vn, biểu mẫu PDF, hướng dẫn cơ quan.
 	- Lưu trữ dưới dạng Markdown/JSON; chunk theo bước logic (một chunk = một giấy tờ / một bước / một giải thích trường), giữ `source_url`, `procedure_id`, `field_id`.
@@ -41,17 +46,81 @@ Mục tiêu: xây dựng pipeline demo trong 48 giờ cho 3 thủ tục (đăng 
 	5. Checkpoint 4: widget + API + deploy demo.
 
 Ghi chú: Giữ tách biệt rõ ràng giữa luật (deterministic) và LLM (probabilistic); mọi phản hồi cần kèm `source_url` để đảm bảo auditability và compliance.
+```mermaid
+flowchart TD
 
-## 3. Đối tượng khách hàng & Tác động (Target Audience & Impact)
-- Người dân: chuẩn bị đúng hồ sơ ngay lần đầu, giảm lượt đi lại và chi phí, trải nghiệm trực tuyến tốt hơn.
-- Cán bộ tiếp nhận: giảm hồ sơ trả lại, giảm thời gian xử lý bổ sung, tập trung vào nhiệm vụ chuyên môn.
-- Đơn vị triển khai (Sở, Trung tâm, Cổng): nâng cao chất lượng đầu vào, giảm tải vận hành và dễ triển khai theo module.
-- KPIs: giảm % hồ sơ trả lại, giảm thời gian xử lý trung bình, tăng tỉ lệ hoàn thành hồ sơ lần đầu.
+    A[Người dân nhập nhu cầu]
+    B[AI Orchestrator]
+    C[Intent Detection]
+    D{Đã đủ thông tin chưa?}
 
-## 4. Tính khả thi & Điểm độc đáo (Feasibility & Uniqueness)
-- Tính khả thi: Thiết kế modular cho phép thí điểm nhanh (3 thủ tục) và demo trong 48 giờ: ingest → embed → vector store → RAG → generation + validation → widget/API.
-- Điểm độc đáo:
-	- Hướng dẫn có căn cứ (grounded) kèm trích dẫn nguồn theo chunk.
-	- Hai lớp kiểm tra tách biệt: luật (deterministic) và LLM (semantic) — minh chứng tư duy kỹ thuật.
-	- Đầu ra cấu trúc (JSON checklist + lỗi có trường, mô tả, gợi ý sửa) sẵn sàng cho UI/widget nhúng.
-	- Tích hợp (API/widget) không thay đổi quy trình vận hành hiện hữu.
+    E[LLM hỏi câu làm rõ]
+    F[Tạo truy vấn tìm kiếm]
+
+    G[Hybrid Retrieval]
+
+    H[Metadata Filter]
+    I[Keyword Search]
+    J[Vector Search]
+
+    K[Kho dữ liệu thủ tục]
+
+    L[Reranker]
+
+    M[Các đoạn quy định phù hợp nhất]
+
+    N[LLM tạo hướng dẫn có nguồn]
+
+    O[Checklist + Các bước + Phí + Thời gian]
+
+    P[Người dân nhập hồ sơ]
+
+    Q[Validation Engine]
+
+    R[Kiểm tra điều kiện]
+    S[Kiểm tra mâu thuẫn]
+    T[Kiểm tra định dạng]
+    U[Kiểm tra trường bắt buộc]
+
+    V[Báo cáo lỗi và cách sửa]
+
+    %% Guided Intake
+    A --> B
+    B --> C
+    C --> D
+
+    D -- Chưa --> E
+    E --> A
+
+    D -- Đủ --> F
+    F --> G
+
+    %% Hybrid Retrieval
+    G --> H
+    G --> I
+    G --> J
+
+    H --> K
+    I --> K
+    J --> K
+
+    K --> L
+    L --> M
+    M --> N
+    N --> O
+
+    %% Validation
+    O --> P
+    P --> Q
+
+    Q --> R
+    Q --> S
+    Q --> T
+    Q --> U
+
+    R --> V
+    S --> V
+    T --> V
+    U --> V
+```	
+
