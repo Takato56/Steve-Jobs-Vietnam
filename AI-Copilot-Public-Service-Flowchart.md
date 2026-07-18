@@ -1,6 +1,6 @@
 # AI Copilot for Public Services Flowchart
-```mermaid
 
+```mermaid
 flowchart TD
     A([Bắt đầu])
 
